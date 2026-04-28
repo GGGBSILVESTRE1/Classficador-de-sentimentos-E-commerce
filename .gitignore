@@ -6,5 +6,5 @@ __pycache__
 *.xlsx
 *.parquet
 *.pyc
-__init__.py
 *.egg-info/
+__init__

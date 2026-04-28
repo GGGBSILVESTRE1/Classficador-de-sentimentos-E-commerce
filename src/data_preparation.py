@@ -5,7 +5,7 @@ from typing import Iterable
 import pandas as pd
 import requests
 
-from config import RAW_DIR, PROCESSED_DIR, DATASET_SPECS, STANDARD_COLUMNS, ColumnSpec
+from .config import RAW_DIR, PROCESSED_DIR, DATASET_SPECS, STANDARD_COLUMNS, ColumnSpec
 
 
 # Funções de download para cada tipo de fonte (GitHub, Kaggle, Octaprice)
