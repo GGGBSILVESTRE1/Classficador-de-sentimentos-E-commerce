@@ -6,7 +6,17 @@ from typing import Iterable
 import pandas as pd
 import requests
 
-from .config import RAW_DIR, PROCESSED_DIR, DATASET_SPECS, STANDARD_COLUMNS, ColumnSpec
+from .config import (
+    RAW_DIR,
+    PROCESSED_DIR,
+    ALL_REVIEWS_PATH,
+    SAMPLE_REVIEWS_PATH,
+    SAMPLE_SIZE_DEV,
+    RANDOM_STATE,
+    DATASET_SPECS,
+    STANDARD_COLUMNS,
+    ColumnSpec,
+)
 
 
 # Funções de download para cada tipo de fonte (GitHub, Kaggle, Octaprice)
@@ -329,7 +339,16 @@ def fetch_all_data() -> dict[str, Path]:
         prepared_frames.append(df)
         print(f"{source_name}: {len(df)} linhas salvas em {saved_files[source_name]}")
 
-    # Se combine=True, junta TODOS os DataFrames em um so
+    all_reviews = pd.concat(prepared_frames, ignore_index=True)
+    all_reviews.to_parquet(ALL_REVIEWS_PATH, index=False)
+    saved_files["all_reviews"] = ALL_REVIEWS_PATH
+    print(f"all_reviews: {len(all_reviews)} linhas salvas em {ALL_REVIEWS_PATH}")
+
+    sample_size = min(SAMPLE_SIZE_DEV, len(all_reviews))
+    sample = all_reviews.sample(n=sample_size, random_state=RANDOM_STATE)
+    sample.to_parquet(SAMPLE_REVIEWS_PATH, index=False)
+    saved_files["sample"] = SAMPLE_REVIEWS_PATH
+    print(f"sample: {len(sample)} linhas salvas em {SAMPLE_REVIEWS_PATH}")
 
     return saved_files
 
