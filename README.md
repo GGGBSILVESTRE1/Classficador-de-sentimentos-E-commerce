@@ -1,7 +1,7 @@
 # Projeto PLN
 
 
-# Etapa para criação do ambiente virtual e download das dependências
+# Etapa para criação do ambiente virtual e ativar ele
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
