@@ -7,4 +7,3 @@ __pycache__
 *.parquet
 *.pyc
 *.egg-info/
-__init__

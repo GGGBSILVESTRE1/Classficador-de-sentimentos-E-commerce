@@ -1,5 +1,6 @@
 import kagglehub
 from pathlib import Path
+from shutil import copy2
 from typing import Iterable
 
 import pandas as pd
@@ -24,6 +25,9 @@ def download_kaggle_file(dataset: str, filename: str, output_path: Path) -> Path
     """
     Faz download de um arquivo especifico de um dataset do Kaggle usando kagglehub.
     """
+    if output_path.exists():
+        return output_path
+
     dataset_path = Path(kagglehub.dataset_download(dataset))
     source_path = dataset_path / filename
 
@@ -37,6 +41,7 @@ def download_kaggle_file(dataset: str, filename: str, output_path: Path) -> Path
         source_path = matches[0]
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    copy2(source_path, output_path)
     return output_path
 
 

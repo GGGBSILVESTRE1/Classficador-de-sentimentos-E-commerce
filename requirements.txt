@@ -1,8 +1,4 @@
-# Dependencias diretas do projeto.
-# Observacao: pip freeze lista o ambiente inteiro e pode incluir o proprio
-# projeto em modo editavel. Para congelar o ambiente sem essa linha, use:
-# python -m pip freeze --exclude-editable
-
+﻿
 emoji==2.15.0
 kagglehub==1.0.0
 pandas==3.0.2
