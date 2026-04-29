@@ -247,6 +247,36 @@ def save_dataset(df: pd.DataFrame, source_name: str) -> Path:
     return output_path
 
 
+def balanced_sample_by_score(
+    df: pd.DataFrame, sample_size: int, random_state: int
+) -> pd.DataFrame:
+    """
+    Cria uma amostra equilibrada entre os valores de score disponiveis.
+    """
+    if sample_size <= 0 or df.empty:
+        return df.head(0).copy()
+
+    sample_size = min(sample_size, len(df))
+    score_counts = df["score"].value_counts().sort_index()
+    score_values = list(score_counts.index)
+
+    if not score_values:
+        return df.head(0).copy()
+
+    per_score = sample_size // len(score_values)
+    remainder = sample_size % len(score_values)
+    sampled_frames = []
+
+    for position, score in enumerate(score_values):
+        score_df = df[df["score"] == score]
+        group_size = per_score + (1 if position < remainder else 0)
+        group_size = min(group_size, len(score_df))
+        sampled_frames.append(score_df.sample(n=group_size, random_state=random_state))
+
+    sample = pd.concat(sampled_frames, ignore_index=True)
+    return sample.sample(frac=1, random_state=random_state).reset_index(drop=True)
+
+
 def prepare_b2w() -> pd.DataFrame:
     """Prepara dados do B2W (GitHub)"""
     raw_path = RAW_DIR / "b2w_reviews.csv"
@@ -319,7 +349,6 @@ def fetch_all_data() -> dict[str, Path]:
     1. Cria pastas necessarias
     2. Executa prepare_*() para cada fonte
     3. Salva cada dataset em data/processed/
-    4. Opcionalmente combina tudo em um arquivo
 
     """
 
@@ -345,7 +374,7 @@ def fetch_all_data() -> dict[str, Path]:
     print(f"all_reviews: {len(all_reviews)} linhas salvas em {ALL_REVIEWS_PATH}")
 
     sample_size = min(SAMPLE_SIZE_DEV, len(all_reviews))
-    sample = all_reviews.sample(n=sample_size, random_state=RANDOM_STATE)
+    sample = balanced_sample_by_score(all_reviews, sample_size, RANDOM_STATE)
     sample.to_parquet(SAMPLE_REVIEWS_PATH, index=False)
     saved_files["sample"] = SAMPLE_REVIEWS_PATH
     print(f"sample: {len(sample)} linhas salvas em {SAMPLE_REVIEWS_PATH}")
