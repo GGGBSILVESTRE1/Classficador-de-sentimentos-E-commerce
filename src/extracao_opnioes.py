@@ -175,20 +175,21 @@ matcher.add(
     ],
 )
 
-# regra direta de opnião, como 'produto ruim' ou 'entrega rápida'
+# regra direta de opinião, como 'produto ruim' ou 'entrega rápida'
 matcher.add(
-    "OPINIAO_DIRETA",
+    "OPINIAO_DIRETA_POS",
     [
         [
-            {"POS": {"IN": ["NOUN", "PROPN"]}},
-            {"LOWER": {"IN": ADJETIVOS_OPINIAO}},
+            {"LOWER": {"IN": SUBSTANTIVOS_AVALIADOS}},
+            {"POS": "ADJ", "LOWER": {"NOT_IN": INTENSIFICADORES}},
         ],
         [
+            {"POS": "ADJ", "LOWER": {"NOT_IN": INTENSIFICADORES}},
             {"LOWER": {"IN": SUBSTANTIVOS_AVALIADOS}},
-            {"LOWER": {"IN": ADJETIVOS_OPINIAO}},
         ],
     ],
 )
+
 
 # regra de opnião onde o adjetivo de opnião vem antes como  'otimo produto'
 matcher.add(
@@ -217,13 +218,21 @@ matcher.add(
     "OPINIAO_INTENSIFICADA",
     [
         [
-            {"LOWER": {"IN": INTENSIFICADORES}},
-            {"LOWER": {"IN": [*ADJETIVOS_OPINIAO, *AVALIACOES_FUNCIONAMENTO]}},
+            {
+                "LOWER": {"IN": SUBSTANTIVOS_AVALIADOS}
+            },  # 1. Trava na sua lista de produtos
+            {
+                "LOWER": {"IN": INTENSIFICADORES},
+                "OP": "+",
+            },  # 2. Exige 1 ou mais intensificadores
+            {
+                "POS": "ADJ"
+            },  # 3. A MÁGICA: Pega literalmente qualquer adjetivo que existir!
         ],
         [
+            {"LOWER": {"IN": INTENSIFICADORES}, "OP": "+"},
+            {"POS": "ADJ"},
             {"LOWER": {"IN": SUBSTANTIVOS_AVALIADOS}},
-            {"LOWER": {"IN": INTENSIFICADORES}},
-            {"LOWER": {"IN": [*ADJETIVOS_OPINIAO, *AVALIACOES_FUNCIONAMENTO]}},
         ],
     ],
 )
